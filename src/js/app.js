@@ -1,7 +1,6 @@
 App = {
   web3Provider: null,
   contracts: {},
-  account: '0x0',
   hasCreatedProfile: false,
 
   init: function() {
@@ -28,7 +27,7 @@ App = {
       App.contracts.account = TruffleContract(account);
       // Connect provider to interact with contract
       App.contracts.account.setProvider(App.web3Provider);
-
+      App.Account = App.contracts.account.deployed()
       App.listenForEvents();
 
       return App.render();
@@ -41,7 +40,7 @@ App = {
       // Restart Chrome if you are unable to receive this event
       // This is a known issue with Metamask
       // https://github.com/MetaMask/metamask-extension/issues/2393
-      instance.usersCheck({}, {
+      instance.Check({}, {
         fromBlock: 0,
         toBlock: 'latest'
       }).watch(function(error, event) {
@@ -62,7 +61,7 @@ App = {
     // Load account data
     web3.eth.getCoinbase(function(err, account) {
       if (err === null) {
-        App.account = account;
+        App.contract.account = account;
         $("#accountAddress").html("Your Account: " + account);
       }
     });
@@ -90,20 +89,32 @@ App = {
     for (var i = 0; i < certifs.length; i++) {
       const certif = certifs[i];
       var certifTemplate = " <div class=``card col-md-3 mt-5`` id=``certificates``><div class=``card-content``><div class=``card-body p-0``><div class=``profile``> <img src=``https://freepngimg.com/thumb/symbol/87865-leaf-icons-button-mark-computer-green-check.png``> </div> <div class=``card-title``>"+certif.name+"<br /><small>Received on the "+certif.date+"</small> </div></div></div></div>"
-      profiles.append(certifTemplate);
+      certificates.append(certifTemplate);
     }
   },
 
   addProfile: async() => {
-    App.setLoading(true)
+    console.log("accessed")
     const firstName = $('#exampleInputFirstName').val()
     const lastName = $('#exampleInputLastName').val()
     const phone = $('#exampleInputPhone').val()
     const email = $('#exampleInputEmail').val()
     await App.account.addUser(firstName, lastName, phone, email)
     await App.render()
-
     location.reload()
+  },
+
+  addCertificate: async() => {
+    const link = $('#exampleInputLink').val()
+    const name = $('#exampleInputName').val()
+    const date = $('#exampleInputDate').val()
+    await App.account.addCertificate(link, name, date)
+    await App.render()
+    location.reload()
+  },
+
+  verify: async(address, id) => {
+    App.verifyCertificate(address, id)
   }
   
 };

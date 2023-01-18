@@ -21,9 +21,10 @@ contract Account {
     mapping(address => User) public users;
     mapping(address => bool) public usersCheck;
     uint public profilescount ;
+    event Check(address indexed _from,address indexed _to);
     mapping(address => Certificate[]) public userCertificates;
     User[] allUsers;
-    function addUser (string memory firstName, string memory lastName, string memory phone, string memory email) {
+    function addUser(string memory firstName, string memory lastName, string memory phone, string memory email) {
         require (!usersCheck[msg.sender]); 
         User memory u = User(msg.sender, firstName, lastName, phone, email);
         users[msg.sender] = u;
@@ -44,7 +45,7 @@ contract Account {
     function getUserCertificates(address userAddress) public view returns(Certificate [] memory) {
         return userCertificates[userAddress];
     }
-    function verifyCertificate(address userAddress, uint256 _id, string link_) public {
+    function verifyCertificate(address userAddress, uint256 _id) public {
         for(uint256 i = 0; i < userCertificates[userAddress].length; i++) {
             if (userCertificates[userAddress][i].id == _id) {
                 userCertificates[userAddress][i].verified = true;
